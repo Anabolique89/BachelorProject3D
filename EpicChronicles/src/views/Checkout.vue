@@ -370,7 +370,7 @@ const form = ref({
 const processing = ref(false)
 
 onMounted(async () => {
-  // Fetch cart
+    
   await store.dispatch('cart/fetchCart')
 
   // Pre-fill email from user
@@ -426,7 +426,7 @@ async function handleSubmit() {
 
     // ✅ Redirect to order confirmation page
     router.push({ 
-      name: 'order-confirmation', 
+      name: 'order-detail', 
       params: { id: response.data.order.id } 
     })
 

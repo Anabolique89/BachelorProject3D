@@ -101,10 +101,16 @@ const routes = [
                 component: () => import("../views/Profile.vue"),
             },
             {
-                path: "orders/:id",
-                name: "order-confirmation",
+                path: "orders",
+                name: "orders",
                 meta: { requiresAuth: true },
                 component: () => import("../views/Orders.vue"),
+            },
+            {
+                path: "orders/:id",
+                name: "order-detail",
+                meta: { requiresAuth: true },
+                component: () => import("../views/OrderConfirmation.vue"),
             },
             {
                 path: "checkout",
