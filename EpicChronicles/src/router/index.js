@@ -75,6 +75,16 @@ const routes = [
                 component: Shop,
             },
             {
+                path: "/payment/success",
+                name: "payment-success",
+                component: () => import("../views/PaymentSuccess.vue"),
+            },
+            {
+                path: "/payment/cancel",
+                name: "payment-cancel",
+                component: () => import("../views/PaymentCancel.vue"),
+            },
+            {
                 path: "cart",
                 name: "cart",
                 component: () => import("../views/Cart.vue"),

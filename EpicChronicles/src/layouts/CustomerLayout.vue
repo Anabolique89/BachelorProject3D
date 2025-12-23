@@ -5,9 +5,10 @@
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
         
+          <!-- Logo -->
           <div class="flex items-center">
             <router-link :to="{ name: 'shop' }" class="flex items-center">
-            <img :src="logo" alt="Epic Chronicles Logo" class="h-12 w-auto">
+              <img :src="logo" alt="Epic Chronicles Logo" class="h-12 w-auto">
             </router-link>
           </div>
 
@@ -85,70 +86,86 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
               </svg>
             </button>
-<!-- cart -->
-          <router-link 
-    :to="{ name: 'cart' }" 
-    class="text-gray-300 hover:text-yellow-400 transition-colors relative"
-  >
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-    </svg>
-   
-    <span 
-      v-if="cartCount > 0"
-      class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
-    >
-      {{ cartCount }}
-    </span>
-  </router-link>
 
-            <!-- User Menu -->
-            <div v-if="user" class="relative" @mouseenter="showUserMenu = true" @mouseleave="showUserMenu = false">
-              <button class="flex items-center text-gray-300 hover:text-yellow-400 transition-colors">
+            <!-- Cart -->
+            <router-link 
+              :to="{ name: 'cart' }" 
+              class="text-gray-300 hover:text-yellow-400 transition-colors relative"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span 
+                v-if="cartCount > 0"
+                class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center"
+              >
+                {{ cartCount }}
+              </span>
+            </router-link>
+
+            <!-- User Menu (HeadlessUI) -->
+            <Menu as="div" v-if="user" class="relative hidden md:block">
+              <MenuButton class="flex items-center text-gray-300 hover:text-yellow-400 transition-colors focus:outline-none">
                 <div class="h-8 w-8 rounded-full bg-yellow-400 flex items-center justify-center text-gray-900 font-bold">
                   {{ user.name?.charAt(0).toUpperCase() }}
                 </div>
-              </button>
+              </MenuButton>
 
-              <!-- User Dropdown -->
-              <div 
-                v-show="showUserMenu"
-                class="absolute right-0 mt-2 w-48 rounded-md bg-gray-900/95 backdrop-blur-lg shadow-lg ring-1 ring-white/10"
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
               >
-                <div class="py-1">
-                  <router-link 
-                    :to="{ name: 'profile' }"
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-yellow-400"
-                  >
-                    My Profile
-                  </router-link>
-                  <router-link 
-                    :to="{ name: 'orders' }"
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-yellow-400"
-                  >
-                    My Orders
-                  </router-link>
-                  <router-link 
-                    :to="{ name: 'favorites' }"
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-yellow-400"
-                  >
-                    Favorites
-                  </router-link>
-                  <button 
-                    @click="logout"
-                    class="block w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-red-400"
-                  >
-                    Sign Out
-                  </button>
-                </div>
-              </div>
-            </div>
+                <MenuItems class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-gray-900/95 backdrop-blur-lg shadow-lg ring-1 ring-white/10 focus:outline-none">
+                  <div class="py-1">
+                    <MenuItem v-slot="{ active }">
+                      <router-link
+                        :to="{ name: 'profile' }"
+                        :class="[active ? 'bg-white/10 text-yellow-400' : 'text-gray-300', 'block px-4 py-2 text-sm']"
+                      >
+                        My Profile
+                      </router-link>
+                    </MenuItem>
+                    
+                    <MenuItem v-slot="{ active }">
+                      <router-link
+                        :to="{ name: 'orders' }"
+                        :class="[active ? 'bg-white/10 text-yellow-400' : 'text-gray-300', 'block px-4 py-2 text-sm']"
+                      >
+                        My Orders
+                      </router-link>
+                    </MenuItem>
+                    
+                    <MenuItem v-slot="{ active }">
+                      <router-link
+                        :to="{ name: 'favorites' }"
+                        :class="[active ? 'bg-white/10 text-yellow-400' : 'text-gray-300', 'block px-4 py-2 text-sm']"
+                      >
+                        Favorites
+                      </router-link>
+                    </MenuItem>
+                    
+                    <MenuItem v-slot="{ active }">
+                      <button
+                        @click="logout"
+                        :class="[active ? 'bg-white/10 text-red-400' : 'text-gray-300', 'block w-full text-left px-4 py-2 text-sm']"
+                      >
+                        Sign Out
+                      </button>
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </transition>
+            </Menu>
 
             <!-- Login Button (if not authenticated) -->
             <router-link 
               v-else
               :to="{ name: 'login' }" 
-              class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
+              class="hidden md:block text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
             >
               SIGN IN
             </router-link>
@@ -189,6 +206,38 @@
             @click="mobileMenuOpen = false"
           >
             FAVORITES
+          </router-link>
+
+          <!-- Mobile User Menu -->
+          <div v-if="user" class="border-t border-white/10 pt-2 mt-2">
+            <router-link 
+              :to="{ name: 'profile' }" 
+              class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+              @click="mobileMenuOpen = false"
+            >
+              My Profile
+            </router-link>
+            <router-link 
+              :to="{ name: 'orders' }" 
+              class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+              @click="mobileMenuOpen = false"
+            >
+              My Orders
+            </router-link>
+            <button 
+              @click="logout"
+              class="block w-full text-left px-3 py-2 text-base font-medium text-gray-300 hover:text-red-400 hover:bg-white/10 rounded-md"
+            >
+              Sign Out
+            </button>
+          </div>
+          <router-link 
+            v-else
+            :to="{ name: 'login' }" 
+            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+            @click="mobileMenuOpen = false"
+          >
+            SIGN IN
           </router-link>
         </div>
       </div>
@@ -257,11 +306,12 @@
 </template>
 
 <script setup>
-import logo from '../assets/logo.png';
+import logo from '../assets/logo.png'
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import axiosClient from '../axios'
+import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
 const router = useRouter()
 const store = useStore()
@@ -270,7 +320,6 @@ const user = computed(() => store.state.user.data)
 const cartCount = computed(() => store.getters['cart/cartItemCount'])
 const categories = ref([])
 const showCategories = ref(false)
-const showUserMenu = ref(false)
 const mobileMenuOpen = ref(false)
 const searchOpen = ref(false)
 const searchQuery = ref('')
@@ -281,7 +330,6 @@ onMounted(async () => {
     await store.dispatch('cart/fetchCartCount')
   }
 })
-
 
 async function loadCategories() {
   try {

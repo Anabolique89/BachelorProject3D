@@ -370,7 +370,7 @@ const form = ref({
 const processing = ref(false)
 
 onMounted(async () => {
-    
+
   await store.dispatch('cart/fetchCart')
 
   // Pre-fill email from user
@@ -385,7 +385,7 @@ onMounted(async () => {
     form.value.last_name = nameParts.slice(1).join(' ') || ''
   }
 
-  // Redirect if cart is empty
+
   if (cartItems.value.length === 0 && !loading.value) {
     alert('Your cart is empty!')
     router.push({ name: 'shop' })
@@ -421,14 +421,15 @@ async function handleSubmit() {
 
     const response = await axiosClient.post('/orders', orderData)
 
-    // Clear local cart state
-    await store.dispatch('cart/clearCart')
-
-    // ✅ Redirect to order confirmation page
-    router.push({ 
-      name: 'order-detail', 
-      params: { id: response.data.order.id } 
-    })
+//stripe checkout
+    if (response.data.stripe?.url) {
+      
+      window.location.href = response.data.stripe.url
+    } else {
+     
+      alert('⚠️ Payment setup failed. Please try again.')
+      processing.value = false
+    }
 
   } catch (error) {
     console.error('Checkout failed:', error)
@@ -438,7 +439,6 @@ async function handleSubmit() {
     } else {
       alert('Failed to place order. Please try again.')
     }
-  } finally {
     processing.value = false
   }
 }

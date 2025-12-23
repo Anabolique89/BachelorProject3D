@@ -10,6 +10,7 @@ use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Services\StripeService;
 
 class OrderController extends Controller
 {
@@ -18,7 +19,15 @@ class OrderController extends Controller
      * 
      * POST /api/orders
      */
-    public function store(Request $request)
+
+   protected $stripeService;
+
+    public function __construct(StripeService $stripeService)
+    {
+        $this->stripeService = $stripeService;
+    }
+
+  public function store(Request $request)
     {
         $request->validate([
             'shipping_details.first_name' => 'required|string|max:45',
@@ -85,14 +94,14 @@ class OrderController extends Controller
                 'total_price' => $total,
                 'discount_amount' => 0,
                 'tokens_used' => 0,
-                'tokens_earned' => floor($total), // 1 token per dollar
+                'tokens_earned' => floor($total), 
                 'created_by' => $user->id,
             ]);
 
             // Create order items and reduce stock
             foreach ($cartItems as $cartItem) {
-                $price = $cartItem->product->is_on_sale
-                    ? $cartItem->product->sale_price
+                $price = $cartItem->product->is_on_sale 
+                    ? $cartItem->product->sale_price 
                     : $cartItem->product->price;
 
                 OrderItem::create([
@@ -121,7 +130,7 @@ class OrderController extends Controller
                 'country_code' => $request->shipping_details['country_code'],
             ]);
 
-            // Create payment record
+            // Create payment record (pending)
             Payment::create([
                 'order_id' => $order->id,
                 'amount' => $total,
@@ -130,17 +139,23 @@ class OrderController extends Controller
                 'created_by' => $user->id,
             ]);
 
-            // Award tokens to customer
-            $customer->increment('total_tokens', floor($total));
-            $customer->increment('available_tokens', floor($total));
-
-            // Clear cart
-            CartItem::where('customer_id', $customer->id)->delete();
+            // Clear cart (will be done after successful payment)
+            // CartItem::where('customer_id', $customer->id)->delete();
 
             DB::commit();
 
-            // Load relationships for response
-            $order->load(['items.product', 'details', 'payment']);
+            // Load relationships for Stripe session
+            $order->load(['items.product', 'details']);
+
+            // CHANGE TO REAL DOMAIN LINK - but which one, main website, or /checkout? !!
+            $successUrl = env('FRONTEND_URL', 'http://localhost:3000') . '/payment/success?session_id={CHECKOUT_SESSION_ID}';
+            $cancelUrl = env('FRONTEND_URL', 'http://localhost:3000') . '/payment/cancel';
+
+            $stripeSession = $this->stripeService->createCheckoutSession(
+                $order,
+                $successUrl,
+                $cancelUrl
+            );
 
             return response()->json([
                 'message' => 'Order created successfully',
@@ -152,7 +167,12 @@ class OrderController extends Controller
                     'tokens_earned' => $order->tokens_earned,
                     'items_count' => $order->items->count(),
                 ],
+                'stripe' => [
+                    'session_id' => $stripeSession->id,
+                    'url' => $stripeSession->url,
+                ],
             ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -203,4 +223,38 @@ class OrderController extends Controller
             'order' => $order,
         ]);
     }
+
+    /**
+ * Verify Stripe session and get order
+ * 
+ * GET /api/stripe/verify-session/{sessionId}
+ */
+public function verifyStripeSession($sessionId)
+{
+    try {
+        \Stripe\Stripe::setApiKey(config('stripe.secret_key'));
+        
+        $session = \Stripe\Checkout\Session::retrieve($sessionId);
+        
+        if ($session->payment_status === 'paid') {
+            $orderId = $session->client_reference_id ?? $session->metadata->order_id ?? null;
+            
+            return response()->json([
+                'success' => true,
+                'order_id' => $orderId,
+            ]);
+        }
+        
+        return response()->json([
+            'success' => false,
+            'message' => 'Payment not completed',
+        ]);
+        
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
 }
