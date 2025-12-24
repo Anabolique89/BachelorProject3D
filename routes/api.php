@@ -7,9 +7,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ContactController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/contact', [ContactController::class, 'store']);
 
 // Email verification routes
 Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
@@ -45,21 +47,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/sync', [CartController::class, 'sync']);
     });
 
-        // Orders
+    // Orders
     Route::prefix('orders')->group(function () {
         Route::get('/', [OrderController::class, 'index']);
         Route::post('/', [OrderController::class, 'store']);
         Route::get('/{id}', [OrderController::class, 'show']);
     });
 
-       // Profile Routes
+    // Profile Routes
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'show']);
         Route::put('/', [ProfileController::class, 'update']);
         Route::put('/password', [ProfileController::class, 'updatePassword']);
     });
     //stripe
-      Route::get('/stripe/verify-session/{sessionId}', [OrderController::class, 'verifyStripeSession']);
+    Route::get('/stripe/verify-session/{sessionId}', [OrderController::class, 'verifyStripeSession']);
 
     // ADMIN 
     Route::middleware('admin')->prefix('admin')->group(function () {

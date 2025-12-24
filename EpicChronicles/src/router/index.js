@@ -97,7 +97,43 @@ const routes = [
             {
                 path: "island-hub",
                 name: "island-hub",
+                meta: { hideNavbar: true },
                 component: () => import("../views/IslandHub.vue"),
+            },
+            {
+                path: "games",
+                name: "games",
+                component: () => import("../views/Games.vue"),
+            },
+            {
+                path: "runes",
+                name: "runes",
+                component: () => import("../views/Runes.vue"),
+            },
+            {
+                path: "quests",
+                name: "quests",
+                component: () => import("../views/Quests.vue"),
+            },
+            {
+                path: "specials",
+                name: "specials",
+                component: () => import("../views/Specials.vue"),
+            },
+            {
+                path: "contact",
+                name: "contact",
+                component: () => import("../views/Contact.vue"),
+            },
+            {
+                path: "treasury",
+                name: "treasury",
+                component: () => import("../views/Treasury.vue"),
+            },
+            {
+                path: "rune-exchange",
+                name: "rune-exchange",
+                component: () => import("../views/RuneExchange.vue"),
             },
             {
                 path: "product/:slug",

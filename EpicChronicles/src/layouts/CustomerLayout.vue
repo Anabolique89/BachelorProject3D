@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900">
     <!-- Navigation -->
-    <nav class="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+    <nav v-if="showNavbar" class="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
         
@@ -198,13 +198,13 @@
             class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
             @click="mobileMenuOpen = false"
           >
-            ISLAND HUB
-          </router-link>
-          <router-link 
-            :to="{ name: 'favorites' }" 
-            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
-            @click="mobileMenuOpen = false"
-          >
+           <router-link 
+  :to="{ name: 'island-hub' }" 
+  class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
+  active-class="text-yellow-400"
+>
+  ISLAND HUB
+</router-link>
             FAVORITES
           </router-link>
 
@@ -244,7 +244,7 @@
     </nav>
 
     <!-- Search Bar (toggleable) -->
-    <div v-if="searchOpen" class="bg-black/40 backdrop-blur-md border-b border-white/10 py-4">
+    <div v-if="searchOpen && showNavbar" class="bg-black/40 backdrop-blur-md border-b border-white/10 py-4">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <input
           v-model="searchQuery"
@@ -278,13 +278,13 @@
             </ul>
           </div>
           <div>
-            <h4 class="text-sm font-semibold text-white mb-4">Support</h4>
-            <ul class="space-y-2 text-sm text-gray-400">
-              <li><a href="#" class="hover:text-yellow-400">Contact Us</a></li>
-              <li><a href="#" class="hover:text-yellow-400">Shipping Info</a></li>
-              <li><a href="#" class="hover:text-yellow-400">Returns</a></li>
-            </ul>
-          </div>
+  <h4 class="text-sm font-semibold text-white mb-4">Support</h4>
+  <ul class="space-y-2 text-sm text-gray-400">
+    <li><router-link :to="{ name: 'contact' }" class="hover:text-yellow-400">Contact Us</router-link></li>
+    <li><a href="#" class="hover:text-yellow-400">Shipping Info</a></li>
+    <li><a href="#" class="hover:text-yellow-400">Returns</a></li>
+  </ul>
+</div>
           <div>
             <h4 class="text-sm font-semibold text-white mb-4">Follow Us</h4>
             <div class="flex space-x-4">
@@ -308,12 +308,13 @@
 <script setup>
 import logo from '../assets/logo.png'
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import axiosClient from '../axios'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
 const router = useRouter()
+const route = useRoute()
 const store = useStore()
 
 const user = computed(() => store.state.user.data)
@@ -323,6 +324,9 @@ const showCategories = ref(false)
 const mobileMenuOpen = ref(false)
 const searchOpen = ref(false)
 const searchQuery = ref('')
+const showNavbar = computed(() => {
+  return !route.meta.hideNavbar
+})
 
 onMounted(async () => {
   await loadCategories()
