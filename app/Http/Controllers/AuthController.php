@@ -83,60 +83,65 @@ class AuthController extends Controller
     /**
      * Login user
      */
-    public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-            'remember' => ['boolean']
-        ]);
+ /**
+ * Login user
+ */
+public function login(Request $request)
+{
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+        'remember' => ['boolean']
+    ]);
 
-        $remember = $credentials['remember'] ?? false;
-        unset($credentials['remember']);
+    $remember = $credentials['remember'] ?? false;
+    unset($credentials['remember']);
 
-        if (!Auth::attempt($credentials, $remember)) {
-            return response()->json([
-                'message' => 'Email or password is incorrect'
-            ], 422);
-        }
+    if (!Auth::attempt($credentials, $remember)) {
+        return response()->json([
+            'message' => 'Email or password is incorrect'
+        ], 422);
+    }
 
-        /** @var \App\Models\User $user */
-        $user = Auth::user();
+    /** @var \App\Models\User $user */
+    $user = Auth::user();
 
-        //?email is verified
-        if (!$user->hasVerifiedEmail()) {
-            Auth::logout();
-            return response()->json([
-                'message' => 'Please verify your email address before logging in.',
-                'email_verified' => false,
-                'email' => $user->email
-            ], 403);
-        }
+    //?email is verified
+    if (!$user->hasVerifiedEmail()) {
+        Auth::logout();
+        return response()->json([
+            'message' => 'Please verify your email address before logging in.',
+            'email_verified' => false,
+            'email' => $user->email
+        ], 403);
+    }
 
-        $customer = $user->customer;
+    $customer = $user->customer;
 
-        if (!$customer) {
-            Auth::logout();
-            return response()->json([
-                'message' => 'No customer profile found for this account'
-            ], 403);
-        }
+    if (!$customer) {
+        Auth::logout();
+        return response()->json([
+            'message' => 'No customer profile found for this account'
+        ], 403);
+    }
 
-        if ($customer->status === 'banned') {
-            Auth::logout();
-            return response()->json([
-                'message' => 'Your account has been banned'
-            ], 403);
-        }
+    if ($customer->status === 'banned') {
+        Auth::logout();
+        return response()->json([
+            'message' => 'Your account has been banned'
+        ], 403);
+    }
 
-        if ($customer->status === 'inactive') {
-            Auth::logout();
-            return response()->json([
-                'message' => 'Your account is inactive'
-            ], 403);
-        }
+    if ($customer->status === 'inactive') {
+        Auth::logout();
+        return response()->json([
+            'message' => 'Your account is inactive'
+        ], 403);
+    }
 
-       // Allow login for ALL users, but mark if they're admin
+    $user->load(['customer.userLevel']);
+
+    // Allow login for ALL users, but mark if they're admin
     $token = $user->createToken('main')->plainTextToken;
 
     return response()->json([
@@ -160,11 +165,17 @@ class AuthController extends Controller
         ], 200);
     }
 
-    /**
-     * Get current user
-     */
-    public function me(Request $request)
-    {
-        return new UserResource($request->user());
-    }
+/**
+ * Get current authenticated user
+ */
+public function me(Request $request)
+{
+    $user = $request->user();
+    
+    $user->load(['customer.userLevel']);
+    
+    return response()->json([
+        'data' => new \App\Http\Resources\UserResource($user)
+    ]);
+}
 }

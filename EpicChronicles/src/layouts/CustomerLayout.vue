@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900">
+  <div class="min-h-screen overflow-y-auto bg-gradient-to-br from-indigo-900 via-purple-900 to-gray-900">
     <!-- Navigation -->
     <nav v-if="showNavbar" class="bg-black/30 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -19,41 +19,16 @@
               class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
               active-class="text-yellow-400"
             >
-              HOME
+              SHOP
             </router-link>
 
-            <!-- Categories Dropdown -->
-            <div class="relative" @mouseenter="showCategories = true" @mouseleave="showCategories = false">
-              <button class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors flex items-center">
-                CATEGORIES
-                <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-              </button>
-
-              <!-- Dropdown -->
-              <div 
-                v-show="showCategories"
-                class="absolute left-0 mt-2 w-48 rounded-md bg-gray-900/95 backdrop-blur-lg shadow-lg ring-1 ring-white/10"
-              >
-                <div class="py-1">
-                  <router-link 
-                    :to="{ name: 'shop' }"
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-yellow-400"
-                  >
-                    All Products
-                  </router-link>
-                  <router-link 
-                    v-for="category in categories.slice(0, 6)" 
-                    :key="category.id"
-                    :to="{ name: 'shop', query: { category: category.id } }"
-                    class="block px-4 py-2 text-sm text-gray-300 hover:bg-white/10 hover:text-yellow-400"
-                  >
-                    {{ category.name }}
-                  </router-link>
-                </div>
-              </div>
-            </div>
+            <router-link 
+              :to="{ name: 'contact' }" 
+              class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
+              active-class="text-yellow-400"
+            >
+              CONTACT
+            </router-link>
 
             <router-link 
               :to="{ name: 'island-hub' }" 
@@ -61,6 +36,22 @@
               active-class="text-yellow-400"
             >
               ISLAND HUB
+            </router-link>
+
+            <router-link 
+              :to="{ name: 'games' }" 
+              class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
+              active-class="text-yellow-400"
+            >
+              GAMES
+            </router-link>
+
+            <router-link 
+              :to="{ name: 'quests' }" 
+              class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
+              active-class="text-yellow-400"
+            >
+              QUESTS
             </router-link>
 
             <router-link 
@@ -191,20 +182,46 @@
             class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
             @click="mobileMenuOpen = false"
           >
-            HOME
+            SHOP
           </router-link>
+          
+          <router-link 
+            :to="{ name: 'contact' }" 
+            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+            @click="mobileMenuOpen = false"
+          >
+            CONTACT
+          </router-link>
+
           <router-link 
             :to="{ name: 'island-hub' }" 
             class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
             @click="mobileMenuOpen = false"
           >
-           <router-link 
-  :to="{ name: 'island-hub' }" 
-  class="text-gray-300 hover:text-yellow-400 px-3 py-2 text-sm font-medium transition-colors"
-  active-class="text-yellow-400"
->
-  ISLAND HUB
-</router-link>
+            ISLAND HUB
+          </router-link>
+
+          <router-link 
+            :to="{ name: 'games' }" 
+            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+            @click="mobileMenuOpen = false"
+          >
+            GAMES
+          </router-link>
+
+          <router-link 
+            :to="{ name: 'quests' }" 
+            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+            @click="mobileMenuOpen = false"
+          >
+             QUESTS
+          </router-link>
+
+          <router-link 
+            :to="{ name: 'favorites' }" 
+            class="block px-3 py-2 text-base font-medium text-gray-300 hover:text-yellow-400 hover:bg-white/10 rounded-md"
+            @click="mobileMenuOpen = false"
+          >
             FAVORITES
           </router-link>
 
@@ -256,13 +273,18 @@
       </div>
     </div>
 
+  <SpinWheel 
+      :show="showWelcomeSpin" 
+      @close="closeWelcomeSpin"
+      @prize-won="handlePrizeWon"
+    />
     <!-- Main Content -->
     <main>
       <router-view />
     </main>
 
     <!-- Footer -->
-    <footer class="bg-black/30 backdrop-blur-md border-t border-white/10 mt-20">
+   <footer class="bg-black/30 backdrop-blur-md border-t border-white/10 mt-20">
       <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
@@ -273,18 +295,18 @@
             <h4 class="text-sm font-semibold text-white mb-4">Shop</h4>
             <ul class="space-y-2 text-sm text-gray-400">
               <li><router-link to="/shop" class="hover:text-yellow-400">All Products</router-link></li>
-              <li><router-link to="/shop" class="hover:text-yellow-400">Categories</router-link></li>
-              <li><router-link to="/shop" class="hover:text-yellow-400">New Arrivals</router-link></li>
+              <li><router-link to="/games" class="hover:text-yellow-400">Games</router-link></li>
+              <li><router-link to="/quests" class="hover:text-yellow-400">Quests</router-link></li>
             </ul>
           </div>
           <div>
-  <h4 class="text-sm font-semibold text-white mb-4">Support</h4>
-  <ul class="space-y-2 text-sm text-gray-400">
-    <li><router-link :to="{ name: 'contact' }" class="hover:text-yellow-400">Contact Us</router-link></li>
-    <li><a href="#" class="hover:text-yellow-400">Shipping Info</a></li>
-    <li><a href="#" class="hover:text-yellow-400">Returns</a></li>
-  </ul>
-</div>
+            <h4 class="text-sm font-semibold text-white mb-4">Support</h4>
+            <ul class="space-y-2 text-sm text-gray-400">
+              <li><router-link :to="{ name: 'contact' }" class="hover:text-yellow-400">Contact Us</router-link></li>
+              <li><a href="#" class="hover:text-yellow-400">Shipping Info</a></li>
+              <li><a href="#" class="hover:text-yellow-400">Returns</a></li>
+            </ul>
+          </div>
           <div>
             <h4 class="text-sm font-semibold text-white mb-4">Follow Us</h4>
             <div class="flex space-x-4">
@@ -307,12 +329,15 @@
 
 <script setup>
 import logo from '../assets/logo.png'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue' // ← Added watch
 import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
+import { useToast } from 'vue-toastification'
+import SpinWheel from '../components/popups/WelcomeSpinWheel.vue'
 import axiosClient from '../axios'
 import { Menu, MenuButton, MenuItems, MenuItem } from '@headlessui/vue'
 
+const toast = useToast()
 const router = useRouter()
 const route = useRoute()
 const store = useStore()
@@ -328,12 +353,63 @@ const showNavbar = computed(() => {
   return !route.meta.hideNavbar
 })
 
-onMounted(async () => {
-  await loadCategories()
-  if (store.getters.isAuthenticated) {
-    await store.dispatch('cart/fetchCartCount')
+
+const showWelcomeSpin = ref(false)
+const hasCheckedSpin = ref(false)
+
+
+watch(() => store.getters.isAuthenticated, async (isAuth) => {
+  if (isAuth && !hasCheckedSpin.value) {
+    await checkWelcomeSpin()
+    hasCheckedSpin.value = true
   }
 })
+
+
+onMounted(async () => {
+  await loadCategories()
+  
+  if (store.getters.isAuthenticated) {
+    await store.dispatch('cart/fetchCartCount')
+    
+    // Check welcome spin for authenticated users
+    if (!hasCheckedSpin.value) {
+      await checkWelcomeSpin()
+      hasCheckedSpin.value = true
+    }
+  }
+})
+
+
+const checkWelcomeSpin = async () => {
+  try {
+    const response = await axiosClient.get('/customer/check-welcome-spin')
+    
+    if (response.data.should_show_spin) {
+      setTimeout(() => {
+        showWelcomeSpin.value = true
+        toast.info('🎰 Welcome bonus! Spin the wheel for your prize!', {
+          timeout: 5000
+        })
+      }, 2000)
+    }
+  } catch (error) {
+    console.error('❌ Failed to check welcome spin:', error)
+  }
+}
+
+// Close spin wheel
+const closeWelcomeSpin = () => {
+  showWelcomeSpin.value = false
+}
+
+//  Handle prize won
+const handlePrizeWon = (prize) => {
+  console.log('🎉 Prize won:', prize)
+  toast.success(`🎉 Congratulations! You won ${prize.label}!`, {
+    timeout: 5000
+  })
+}
 
 async function loadCategories() {
   try {

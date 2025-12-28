@@ -289,15 +289,74 @@
         </div>
       </div>
 
-      <!-- Quests Tab -->
-      <div v-if="activeTab === 'quests'">
-        <div class="bg-white/5 backdrop-blur-lg rounded-lg border border-white/10 p-6">
-          <h2 class="text-lg font-medium text-white mb-4">Your Quests</h2>
-          <p class="text-gray-400 text-center py-8">
-            Quest system coming soon! Complete challenges to earn tokens and level up your Viking status.
-          </p>
+     <!-- Quests Tab -->
+<div v-if="activeTab === 'quests'">
+  <div class="bg-white/5 backdrop-blur-lg rounded-lg border border-white/10 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-lg font-medium text-white">Your Quests</h2>
+      <router-link
+        :to="{ name: 'quests' }"
+        class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg font-bold hover:bg-yellow-500 transition-colors text-sm"
+      >
+        View All Quests
+      </router-link>
+    </div>
+
+    <!-- Quest Stats -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white/5 p-4 rounded-lg">
+        <p class="text-2xl font-bold text-white">{{ userQuests.length }}</p>
+        <p class="text-sm text-gray-400">Total Quests</p>
+      </div>
+      <div class="bg-white/5 p-4 rounded-lg">
+        <p class="text-2xl font-bold text-green-400">{{ questsCompleted }}</p>
+        <p class="text-sm text-gray-400">Completed</p>
+      </div>
+      <div class="bg-white/5 p-4 rounded-lg">
+        <p class="text-2xl font-bold text-yellow-400">{{ userQuests.length - questsCompleted }}</p>
+        <p class="text-sm text-gray-400">Available</p>
+      </div>
+      <div class="bg-white/5 p-4 rounded-lg">
+        <p class="text-2xl font-bold text-purple-400">{{ Math.round((questsCompleted / userQuests.length) * 100) || 0 }}%</p>
+        <p class="text-sm text-gray-400">Completion</p>
+      </div>
+    </div>
+
+    <!-- Quest List -->
+    <div class="space-y-3">
+      <div
+        v-for="quest in userQuests.slice(0, 5)"
+        :key="quest.id"
+        class="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
+      >
+        <div class="flex items-center gap-4">
+          <div class="text-3xl">{{ quest.icon }}</div>
+          <div>
+            <h3 class="text-white font-medium">{{ quest.title }}</h3>
+            <p class="text-sm text-gray-400">{{ quest.quest_type }} • {{ quest.difficulty }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <p class="text-yellow-400 font-bold">🪙 {{ quest.rewards.tokens }}</p>
+            <p class="text-sm text-gray-400">⭐ {{ quest.rewards.experience }} XP</p>
+          </div>
+          <div v-if="quest.is_completed" class="text-green-400 text-2xl">
+            ✓
+          </div>
+          <div v-else class="text-gray-500 text-2xl">
+            ○
+          </div>
         </div>
       </div>
+
+      <!-- Show message if no quests -->
+      <div v-if="userQuests.length === 0" class="text-center py-8 text-gray-400">
+        No quests available yet. Check back soon!
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- Runes Tab -->
       <div v-if="activeTab === 'runes'">
@@ -332,6 +391,7 @@ const orderCount = ref(0)
 const questsCompleted = ref(0)
 const runesCollected = ref(0)
 const recentOrders = ref([])
+const userQuests = ref([])
 
 const tabs = [
   { id: 'overview', name: 'Overview' },
@@ -366,26 +426,67 @@ onMounted(async () => {
 async function loadProfileData() {
   loading.value = true
   try {
-    // Load user data
-    await store.dispatch('getCurrentUser')
+    console.log('🔵 START: Loading profile data...')
     
-    if (user.value) {
-      form.value.name = user.value.name || ''
-      form.value.email = user.value.email || ''
+    // Load user data
+    try {
+      await store.dispatch('getCurrentUser')
+      console.log('👤 User loaded:', user.value)
+      console.log('🪙 Customer loaded:', customer.value)
+      
+      if (user.value) {
+        form.value.name = user.value.name || ''
+        form.value.email = user.value.email || ''
+      }
+    } catch (error) {
+      console.error('❌ Failed to load user:', error)
+      // Don't throw - continue loading other data
     }
 
-    // Load orders count and recent orders
-    const ordersResponse = await axiosClient.get('/orders')
-    const orders = ordersResponse.data.data || []
-    orderCount.value = orders.length
-    recentOrders.value = orders.slice(0, 3) // Get 3 most recent
+    // Load orders
+    try {
+      const ordersResponse = await axiosClient.get('/orders')
+      console.log('📦 Orders response:', ordersResponse.data)
+      
+      const orders = ordersResponse.data.data || []
+      orderCount.value = orders.length
+      recentOrders.value = orders.slice(0, 3)
+      
+      console.log('📦 Orders loaded:', orders.length)
+    } catch (error) {
+      console.error('❌ Failed to load orders:', error.response?.data || error.message)
+      // Set defaults
+      orderCount.value = 0
+      recentOrders.value = []
+    }
 
-    // TODO: Load quests and runes when implemented
-    questsCompleted.value = 0
+    // Load quests data 
+    try {
+      const questsResponse = await axiosClient.get('/customer/quests')
+      console.log('🎯 Quests response:', questsResponse.data)
+      
+      userQuests.value = questsResponse.data.quests || []
+      questsCompleted.value = userQuests.value.filter(q => q.is_completed).length
+      
+      console.log('🎯 Total quests:', userQuests.value.length)
+      console.log('✅ Completed quests:', questsCompleted.value)
+    } catch (error) {
+      console.error('❌ Failed to load quests:', error.response?.data || error.message)
+      // Set defaults
+      userQuests.value = []
+      questsCompleted.value = 0
+    }
+
+    // Runes - not implemented yet
     runesCollected.value = 0
+    
+    console.log('🔵 END: Profile data loaded')
+    console.log('👤 Final user:', user.value)
+    console.log('🪙 Final customer:', customer.value)
 
   } catch (error) {
-    console.error('Failed to load profile data:', error)
+    console.error('❌ Failed to load profile data:', error)
+    console.error('❌ Error details:', error.response?.data || error.message)
   } finally {
     loading.value = false
   }

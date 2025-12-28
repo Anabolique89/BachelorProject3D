@@ -8,6 +8,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Api\GameController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -62,6 +63,22 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     //stripe
     Route::get('/stripe/verify-session/{sessionId}', [OrderController::class, 'verifyStripeSession']);
+
+    // Game/Quest endpoints
+    Route::prefix('customer')->group(function () {
+        Route::get('/check-popups', [GameController::class, 'checkPopups']);
+        Route::post('/claim-spin-prize', [GameController::class, 'claimSpinPrize']);
+        Route::post('/claim-daily-reward', [GameController::class, 'claimDailyReward']);
+        Route::get('/check-welcome-spin', [GameController::class, 'checkWelcomeSpin']);
+        Route::post('/complete-quest', [GameController::class, 'completeQuest']);
+
+        Route::get('/quests', [GameController::class, 'getQuests']);
+        Route::get('/stats', [GameController::class, 'getStats']);
+
+        Route::get('/treasury', [GameController::class, 'getTreasury']); // ← MISSING
+        Route::get('/runes', [GameController::class, 'getRunes']);
+    });
+
 
     // ADMIN 
     Route::middleware('admin')->prefix('admin')->group(function () {
