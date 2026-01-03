@@ -224,6 +224,7 @@
 <script setup>
 import { ref } from 'vue'
 import axiosClient from '../axios'
+import { useToast } from 'vue-toastification' 
 
 const form = ref({
   name: '',
@@ -233,6 +234,7 @@ const form = ref({
   message: '',
 })
 
+const toast = useToast()
 const submitting = ref(false)
 const showSuccess = ref(false)
 
@@ -241,11 +243,13 @@ async function submitForm() {
   showSuccess.value = false
 
   try {
-    // TODO: Create contact form endpoint when ready
+    // NEXtt!! Create contact form endpoint
     await axiosClient.post('/contact', form.value)
     
     showSuccess.value = true
-    
+     toast.success('Message sent successfully! We\'ll respond within 24 hours. 📧', {
+      timeout: 5000
+    })
     // Reset form
     form.value = {
       name: '',
@@ -260,9 +264,18 @@ async function submitForm() {
       showSuccess.value = false
     }, 5000)
 
-  } catch (error) {
+ } catch (error) {
     console.error('Contact form error:', error)
-    alert('❌ Failed to send message. Please try again or email us directly.')
+
+    if (error.response?.data?.errors) {
+      Object.values(error.response.data.errors).flat().forEach(err => {
+        toast.error(err)
+      })
+    } else if (error.response?.data?.message) {
+      toast.error(error.response.data.message)
+    } else {
+      toast.error('Failed to send message. Please try emailing us directly at support@epicchronicles.com')
+    }
   } finally {
     submitting.value = false
   }

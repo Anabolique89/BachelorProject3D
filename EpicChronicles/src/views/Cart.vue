@@ -203,9 +203,11 @@
 import { computed, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const store = useStore()
 const router = useRouter()
+const toast = useToast()
 
 const items = computed(() => store.getters['cart/cartItems'])
 const summary = computed(() => store.getters['cart/cartSummary'])
@@ -226,34 +228,41 @@ async function updateQuantity(item, event) {
       id: item.id,
       quantity: newQuantity,
     })
+     toast.success(`Updated quantity to ${newQuantity}`)
   } catch (error) {
-    alert(error.response?.data?.message || 'Failed to update quantity')
+    toast.error(error.response?.data?.message || 'Failed to update quantity')
   }
 }
 
 async function incrementQuantity(item) {
-  if (item.quantity >= item.product.stock_quantity) return
-
+  if (item.quantity >= item.product.stock_quantity) {
+    toast.warning('Maximum stock reached')
+  return
+}
   try {
     await store.dispatch('cart/updateCartItem', {
       id: item.id,
       quantity: item.quantity + 1,
     })
+    toast.success
   } catch (error) {
-    alert(error.response?.data?.message || 'Failed to update quantity')
+   toast.error(error.response?.data?.message || 'Failed to update quantity')
   }
 }
 
 async function decrementQuantity(item) {
-  if (item.quantity <= 1) return
-
+  if (item.quantity <= 1){
+    toast.info('Use "Remove" button to delete item')
+  return
+  }
   try {
     await store.dispatch('cart/updateCartItem', {
       id: item.id,
       quantity: item.quantity - 1,
     })
+    toast.success
   } catch (error) {
-    alert(error.response?.data?.message || 'Failed to update quantity')
+   toast.error(error.response?.data?.message || 'Failed to update quantity')
   }
 }
 
@@ -262,8 +271,11 @@ async function removeItem(id) {
 
   try {
     await store.dispatch('cart/removeFromCart', id)
+      toast.success(`Removed "${item?.product?.title}" from cart 🗑️`, {
+      timeout: 3000
+    })
   } catch (error) {
-    alert('Failed to remove item')
+   toast.error('Failed to remove item')
   }
 }
 

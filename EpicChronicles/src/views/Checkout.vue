@@ -344,9 +344,11 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { Popover, PopoverButton, PopoverOverlay, PopoverPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import axiosClient from '../axios'
+import { useToast } from 'vue-toastification'
 
 const store = useStore()
 const router = useRouter()
+const toast = useToast()
 
 const cartItems = computed(() => store.getters['cart/cartItems'])
 const cartSummary = computed(() => store.getters['cart/cartSummary'])
@@ -387,14 +389,14 @@ onMounted(async () => {
 
 
   if (cartItems.value.length === 0 && !loading.value) {
-    alert('Your cart is empty!')
+ toast.error('Your cart is empty!')
     router.push({ name: 'shop' })
   }
 })
 
 async function handleSubmit() {
   if (cartItems.value.length === 0) {
-    alert('Your cart is empty!')
+    toast.error('Your cart is empty!')
     return
   }
 
@@ -423,11 +425,15 @@ async function handleSubmit() {
 
 //stripe checkout
     if (response.data.stripe?.url) {
-      
-      window.location.href = response.data.stripe.url
+       toast.success('Order created! Redirecting to payment... 💳', {
+        timeout: 2000
+      })
+      setTimeout(() => {
+        window.location.href = response.data.stripe.url
+      }, 500)
     } else {
      
-      alert('⚠️ Payment setup failed. Please try again.')
+    toast.error('Payment setup failed. Please try again.')
       processing.value = false
     }
 
@@ -435,9 +441,14 @@ async function handleSubmit() {
     console.error('Checkout failed:', error)
     
     if (error.response?.data?.message) {
-      alert(`❌ ${error.response.data.message}`)
+   toast.error(error.response.data.message)
+     } else if (error.response?.data?.errors) {
+
+      Object.values(error.response.data.errors).flat().forEach(err => {
+        toast.error(err)
+      })
     } else {
-      alert('Failed to place order. Please try again.')
+      toast.error('Failed to place order. Please try again.')
     }
     processing.value = false
   }
