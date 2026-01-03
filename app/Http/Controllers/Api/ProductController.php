@@ -69,7 +69,7 @@ class ProductController extends Controller
     }
 
     /**
-     * Store a newly created product (Admin only)
+     * Store a newly created product
      */
     public function store(Request $request)
     {
@@ -84,7 +84,7 @@ class ProductController extends Controller
             'is_featured' => 'boolean',
             'token_reward_on_purchase' => 'required|integer|min:0',
             'category_id' => 'nullable|exists:categories,id',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', // ← NEW: Image validation
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048', 
         ]);
 
         /** @var \App\Models\User $user */
@@ -135,7 +135,7 @@ class ProductController extends Controller
         $user = Auth::user();
         $validated['updated_by'] = $user->id;
 
-        // ✅ Handle image upload
+        //  image upload
         if ($request->hasFile('image')) {
             // Delete old image if exists
             if ($product->image && Storage::disk('public')->exists($product->image)) {

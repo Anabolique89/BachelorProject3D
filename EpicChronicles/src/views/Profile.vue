@@ -375,8 +375,10 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useStore } from 'vuex'
 import axiosClient from '../axios'
+import { useToast } from 'vue-toastification'
 
 const store = useStore()
+const toast = useToast()
 
 const user = computed(() => store.state.user.data)
 const customer = computed(() => user.value?.customer)
@@ -392,6 +394,7 @@ const questsCompleted = ref(0)
 const runesCollected = ref(0)
 const recentOrders = ref([])
 const userQuests = ref([])
+
 
 const tabs = [
   { id: 'overview', name: 'Overview' },
@@ -440,7 +443,7 @@ async function loadProfileData() {
       }
     } catch (error) {
       console.error('❌ Failed to load user:', error)
-      // Don't throw - continue loading other data
+      toast.error('Failed to load user profile')
     }
 
     // Load orders
@@ -458,6 +461,7 @@ async function loadProfileData() {
       // Set defaults
       orderCount.value = 0
       recentOrders.value = []
+      toast.error('Failed to load orders')
     }
 
     // Load quests data 
@@ -487,6 +491,7 @@ async function loadProfileData() {
   } catch (error) {
     console.error('❌ Failed to load profile data:', error)
     console.error('❌ Error details:', error.response?.data || error.message)
+ toast.error('Failed to load profile data')
   } finally {
     loading.value = false
   }
@@ -497,13 +502,18 @@ async function updateProfile() {
   try {
     await axiosClient.put('/profile', form.value)
     await store.dispatch('getCurrentUser')
-    alert('✅ Profile updated successfully!')
+    toast.success('Profile updated successfully! ✨', {
+      timeout: 3000
+    })
   } catch (error) {
     if (error.response?.data?.errors) {
       const errors = Object.values(error.response.data.errors).flat()
-      alert('❌ ' + errors.join('\n'))
+         errors.forEach(err => {
+        toast.error(err)
+      })
     } else {
-      alert('❌ Failed to update profile')
+         toast.error('Failed to update profile')
+    
     }
   } finally {
     saving.value = false
@@ -512,12 +522,13 @@ async function updateProfile() {
 
 async function changePassword() {
   if (passwordForm.value.new_password !== passwordForm.value.confirm_password) {
-    alert('❌ Passwords do not match!')
+  toast.error('Password must be at least 8 characters!')
     return
   }
 
   if (passwordForm.value.new_password.length < 8) {
-    alert('❌ Password must be at least 8 characters!')
+        toast.error('Password must be at least 8 characters!')
+
     return
   }
 
@@ -529,7 +540,9 @@ async function changePassword() {
       password_confirmation: passwordForm.value.confirm_password,
     })
     
-    alert('✅ Password updated successfully!')
+    toast.success('Password updated successfully! 🔒', {
+      timeout: 3000
+    })
     
     passwordForm.value = {
       current_password: '',
@@ -538,9 +551,10 @@ async function changePassword() {
     }
   } catch (error) {
     if (error.response?.data?.message) {
-      alert('❌ ' + error.response.data.message)
+            toast.error(error.response.data.message)
     } else {
-      alert('❌ Failed to update password')
+            toast.error('Failed to update password')
+
     }
   } finally {
     changingPassword.value = false

@@ -6,7 +6,6 @@ export default {
         commit("setUser", data.user);
         commit("setToken", data.token);
         
-        // Return the full data (including is_admin flag)
         return data;
     });
 },
@@ -26,7 +25,7 @@ export default {
         const response = await axiosClient.get('/me');
         console.log('getCurrentUser response:', response.data);
         
-        // ✅ FIX: The data is nested inside response.data.data
+        // The data is nested inside response.data.data because of UserResourcee
         if (response.data.data) {
             commit('setUser', response.data.data);
         } else {

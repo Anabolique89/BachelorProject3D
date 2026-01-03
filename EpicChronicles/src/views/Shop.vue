@@ -215,10 +215,12 @@ import { useRouter, useRoute } from 'vue-router'
 import axiosClient from '../axios'
 import ProductQuickView from '../components/ProductQuickView.vue'
 import { useStore } from 'vuex';
+import { useToast } from 'vue-toastification';
 
 const router = useRouter()
 const route = useRoute()
 const store = useStore()
+const toast = useToast()
 
 const products = ref({
   data: [],
@@ -304,6 +306,7 @@ async function loadProducts() {
   } catch (error) {
     console.error('Failed to load products:', error)
     products.value = { data: [], current_page: 1, last_page: 1, from: 0, to: 0, total: 0 }
+   toast.error('Failed to load products. Please try again.')
   } finally {
     loading.value = false
   }
@@ -320,7 +323,7 @@ function closeQuickView() {
 }
 
 function handleAddToCart({ product, quantity }) {
-  alert(`Added ${quantity}x "${product.title}" to cart!`)
+    toast.success(`Added ${quantity}x "${product.title}" to cart! 🛒`)
   console.log('Add to cart:', { product, quantity })
   // TODO: Implement actual cart functionality
 }
@@ -331,6 +334,7 @@ async function loadCategories() {
     categories.value = response.data || []
   } catch (error) {
     console.error('Failed to load categories:', error)
+        toast.error('Failed to load categories') 
   }
 }
 
@@ -352,12 +356,14 @@ function goToProduct(slug) {
 
 async function addToCart(product) {
   if (!store.getters.isAuthenticated) {
+     toast.warning('Please login to add items to cart')
     router.push({ name: 'login' })
     return
   }
 
   if (product.stock_quantity === 0) {
-    alert('This product is out of stock')
+      toast.error('This product is out of stock')
+
     return
   }
 
@@ -367,12 +373,14 @@ async function addToCart(product) {
       quantity: 1,
     })
 
-    // Show success message
-    alert(`Added "${product.title}" to cart!`)
+  
+    toast.success(`Added "${product.title}" to cart! 🛒`, {
+      timeout: 2000
+    })
 
   } catch (error) {
     const message = error.response?.data?.message || 'Failed to add to cart'
-    alert(`❌ ${message}`)
+ toast.error(message)
   }
 }
 

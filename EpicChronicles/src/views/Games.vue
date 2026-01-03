@@ -140,13 +140,13 @@ const questsStatus = ref({
   island_merchant_completed: false
 })
 
-// Three.js variables
+
 let scene, camera, renderer, island, boat, sky, bird
 let lastX = 0
 let rotationSpeed = 0
 const dampingFactor = 0.95
 
-// Click detection (from your React Island2.jsx)
+// Click detection 
 let isDragging = false
 const dragThreshold = 5
 let startPosition = { x: 0, y: 0 }
@@ -310,7 +310,7 @@ loader.load('/models/gislinge_viking_boat_draco.glb', (gltf) => {
 // })
 }
 
-// Pointer handlers (from your React Island2.jsx)
+// Pointer handlers 
 const handlePointerDown = (e) => {
   e.preventDefault()
   
@@ -362,13 +362,12 @@ island.rotation.y += delta * 0.5 * Math.PI
   updateStage()
 }
 
-// Click handler (from your React handleMeshClick)
+// Click handler
 const handleCanvasClick = (e) => {
   console.log('🎯 Click detected!')
   console.log('isDragging:', isDragging)
   console.log('hasMovedEnough:', hasMovedEnough)
   
-  // Only trigger click if we haven't dragged
   if (!hasMovedEnough && !isDragging) {
     console.log('✅ Valid click - checking raycasting')
     
