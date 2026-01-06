@@ -1,51 +1,118 @@
 <template>
-  <div v-if="currentStage === 1" class="text-xl text-center bg-black rounded-md py-2 px-6 text-white mx-5">
-    <h1>
-      Welcome viking fans! We are
-      <span class="font-semibold mx-2 text-white">
-        <br/> Epic Chronicles <br/>
-      </span>
-      Your source for authentic Viking gear and Norse mythology
-    </h1>
+  <!-- Stage 1: Welcome + Shop -->
+  <div v-if="currentStage === 1" class="bg-gradient-to-r from-yellow-400/20 to-orange-500/20 backdrop-blur-sm rounded-lg border border-yellow-400/30 p-4 mx-5">
+    <!-- Desktop: Horizontal -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-white mb-1">⚔️ Welcome, Warrior!</h2>
+        <p class="text-sm text-gray-900">Explore authentic Viking gear & Norse mythology</p>
+      </div>
+      <router-link 
+        :to="{ name: 'shop' }" 
+        class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 rounded-lg text-black font-bold text-sm transition-all whitespace-nowrap"
+      >
+        Shop Now →
+      </router-link>
+    </div>
+
+    <!-- Mobile: Stacked -->
+    <div class="sm:hidden">
+      <h2 class="text-base font-bold text-white mb-1">⚔️ Welcome, Warrior!</h2>
+      <p class="text-xs text-gray-900 mb-3">Explore authentic Viking gear & Norse mythology</p>
+      <router-link 
+        :to="{ name: 'shop' }" 
+        class="block text-center px-4 py-2 bg-yellow-400 hover:bg-yellow-500 rounded-lg text-black font-bold text-sm transition-all"
+      >
+        Shop Now →
+      </router-link>
+    </div>
   </div>
 
-  <div v-else-if="currentStage === 2" class="text-xl leading-snug text-center bg-black rounded-md py-2 px-6 text-white mx-5">
-    <h1 class="font-medium text-center m-2 mb-4">
-      We offer historical Viking products <br /> filled with authentic Norse craftsmanship
-    </h1>
+  <!-- Stage 2: Quests + Games -->
+  <div v-else-if="currentStage === 2" class="bg-gradient-to-r from-purple-400/20 to-blue-500/20 backdrop-blur-sm rounded-lg border border-purple-400/30 p-4 mx-5">
+    <!-- Desktop: Horizontal -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-white mb-1">🪙 Complete Quests & Earn Tokens</h2>
+        <p class="text-sm text-gray-900">Unlock rewards by completing challenges</p>
+      </div>
+      <router-link 
+        :to="{ name: 'games' }" 
+        class="px-4 py-2 bg-purple-400 hover:bg-purple-500 rounded-lg text-white font-bold text-sm transition-all whitespace-nowrap"
+      >
+        View Quests →
+      </router-link>
+    </div>
 
-    <router-link 
-      :to="{ name: 'shop' }" 
-      class="inline-block bg-yellow-400 hover:bg-yellow-500 rounded-md text-black font-bold mb-2 text-center p-2 transition-all"
-    >
-      Explore Our Collection
-    </router-link>
+    <!-- Mobile: Stacked -->
+    <div class="sm:hidden">
+      <h2 class="text-base font-bold text-white mb-1">🪙 Complete Quests & Earn Tokens</h2>
+      <p class="text-xs text-gray-900 mb-3">Unlock rewards by completing challenges</p>
+      <router-link 
+        :to="{ name: 'games' }" 
+        class="block text-center px-4 py-2 bg-purple-400 hover:bg-purple-500 rounded-lg text-white font-bold text-sm transition-all"
+      >
+        View Quests →
+      </router-link>
+    </div>
   </div>
 
-  <div v-else-if="currentStage === 3" class="text-xl text-center bg-black rounded-md py-2 px-2 text-white mx-4">
-    <h1 class="font-medium text-center text-md p-2 mb-4">
-      Find all things about Viking history, gear, <br/> tokens, quests and much more!
-    </h1>
-    
-    <router-link
-      :to="{ name: 'shop' }"
-      class="inline-block bg-yellow-400 hover:bg-yellow-500 rounded-md text-black font-bold p-1 mb-2 transition-all"
-    >
-      Shop Your Favourite Gear
-    </router-link>
+  <!-- Stage 3: Treasury -->
+  <div v-else-if="currentStage === 3" class="bg-gradient-to-r from-green-400/20 to-emerald-500/20 backdrop-blur-sm rounded-lg border border-green-400/30 p-4 mx-5">
+    <!-- Desktop: Horizontal -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-white mb-1">💰 Your Viking Treasury</h2>
+        <p class="text-sm text-gray-900">Track your tokens, orders & discounts</p>
+      </div>
+      <router-link 
+        :to="{ name: 'treasury' }" 
+        class="px-4 py-2 bg-green-400 hover:bg-green-500 rounded-lg text-black font-bold text-sm transition-all whitespace-nowrap"
+      >
+        View Treasury →
+      </router-link>
+    </div>
+
+    <!-- Mobile: Stacked -->
+    <div class="sm:hidden">
+      <h2 class="text-base font-bold text-white mb-1">💰 Your Viking Treasury</h2>
+      <p class="text-xs text-gray-900 mb-3">Track your tokens, orders & discounts</p>
+      <router-link 
+        :to="{ name: 'treasury' }" 
+        class="block text-center px-4 py-2 bg-green-400 hover:bg-green-500 rounded-lg text-black font-bold text-sm transition-all"
+      >
+        View Treasury →
+      </router-link>
+    </div>
   </div>
 
-  <div v-else-if="currentStage === 4" class="text-xl leading-snug text-center bg-black rounded-md py-2 px-6 text-white mx-5">
-    <h1 class="font-medium text-center p-2 mb-4">
-      We are just a few keystrokes away <br/> so reach out and
-    </h1>
+  <!-- Stage 4: Contact -->
+  <div v-else-if="currentStage === 4" class="bg-gradient-to-r from-blue-400/20 to-cyan-500/20 backdrop-blur-sm rounded-lg border border-blue-400/30 p-4 mx-5">
+    <!-- Desktop: Horizontal -->
+    <div class="hidden sm:flex items-center justify-between gap-4">
+      <div class="flex-1">
+        <h2 class="text-lg font-bold text-white mb-1">💬 Need Help?</h2>
+        <p class="text-sm text-gray-900">We're here to answer your questions</p>
+      </div>
+      <router-link 
+        :to="{ name: 'contact' }" 
+        class="px-4 py-2 bg-blue-400 hover:bg-blue-500 rounded-lg text-white font-bold text-sm transition-all whitespace-nowrap"
+      >
+        Contact Us →
+      </router-link>
+    </div>
 
-    <router-link 
-      :to="{ name: 'contact' }" 
-      class="inline-block bg-yellow-400 hover:bg-yellow-500 rounded-md text-black font-bold p-1 mb-2 transition-all"
-    >
-      Ask Us Anything!
-    </router-link>
+    <!-- Mobile: Stacked -->
+    <div class="sm:hidden">
+      <h2 class="text-base font-bold text-white mb-1">💬 Need Help?</h2>
+      <p class="text-xs text-gray-900 mb-3">We're here to answer your questions</p>
+      <router-link 
+        :to="{ name: 'contact' }" 
+        class="block text-center px-4 py-2 bg-blue-400 hover:bg-blue-500 rounded-lg text-white font-bold text-sm transition-all"
+      >
+        Contact Us →
+      </router-link>
+    </div>
   </div>
 </template>
 

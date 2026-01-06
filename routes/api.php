@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Api\GameController;
+use App\Http\Controllers\Api\SocialAuthController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -29,6 +30,9 @@ Route::get('/categories', function () {
         ->get(['id', 'name', 'slug', 'parent_id']);
 });
 
+// Social Authentication
+Route::get('auth/{provider}', [SocialAuthController::class, 'redirectToProvider']);
+Route::get('auth/{provider}/callback', [SocialAuthController::class, 'handleProviderCallback']);
 
 
 Route::middleware('auth:sanctum')->group(function () {

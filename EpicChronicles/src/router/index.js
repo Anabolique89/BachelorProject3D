@@ -40,6 +40,12 @@ const routes = [
         component: Register,
     },
     {
+        path: "/auth/callback",
+        name: "auth.callback",
+        component: () => import("../views/AuthCallback.vue"),
+        meta: { requiresAuth: false },
+    },
+    {
         path: "/verify-email",
         name: "verify-email",
         meta: {
